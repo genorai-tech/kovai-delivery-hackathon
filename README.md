@@ -40,11 +40,39 @@ We recommend using **PydanticAI** for building type-safe, reliable agentic flows
 
 ---
 
-## � The Sandbox (Datasets)
+## 📊 The Sandbox (Datasets)
 We provide you with real-world logistics data in `data/`:
 - **Fleet Matrix**: 100+ drones with specific capacity, speed, and discharge metrics.
 - **Order Stream**: 200+ customer requests with varied mass and delivery coordinates.
 - **Weather Logs**: Tick-by-tick environmental conditions.
+
+## 🧭 Codebase Orientation
+To succeed in this challenge, you must understand how the three core components interact:
+
+### 1. The Engine (`src/simulation/kovai_engine.py`)
+This is the **"Source of Truth."** It simulates the physics of the world, manages drone battery drain, handles package mass, and injects random weather events. 
+*   **Rules**: You cannot modify this file. Your agent must interact with it by sending valid actions.
+*   **Physics**: Drones consume more battery when carrying heavy loads or flying through `STORMY` weather.
+
+### 2. The Mission Runner (`run_mission.py`)
+This is the **"Clock."** It initializes the simulation, loads the CSV datasets, and runs the `tick` loop.
+*   It passes the current `state` of the world to your agent every tick.
+*   It collects the `actions` your agent returns and applies them to the engine.
+
+### 3. The Agent (`src/agent/my_agent.py`)
+This is the **"AI Brain"** and your primary workspace.
+*   We have provided a **Heuristic Baseline**—a simple Python router that moves drones. 
+*   **Your Goal**: Delete the heuristic logic and replace it with a Multi-Agent system that uses actual reasoning and standardized protocols.
+
+---
+
+## 🏗 What You Need to Implement
+Your final submission will be evaluated on your ability to transform a simple script into an industrial-grade agentic system:
+
+1.  **Define Agent Roles**: Implement the specialized roles (Order Analyst, Allocator, Dispatcher, Auditor) within your team.
+2.  **A2A Protocol**: Implement a communication layer where agents exchange JSON-RPC messages to negotiate tasks.
+3.  **MCP Integration**: (Advanced) Refactor the `KovaiMCPServer` into a formal MCP server that your agents "call" to get distance or battery estimates.
+4.  **Stateful Reasoning**: Ensure your agents don't just react to the current tick but maintain a "Memory" of active plans and validations.
 
 ---
 
