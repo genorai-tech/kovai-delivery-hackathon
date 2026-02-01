@@ -6,13 +6,16 @@ Welcome to **KovaiDelivery**. This isn't just a coding task; it’s an engineeri
 
 ---
 
-## 🧠 The Engineering Challenge
-The core problem: **"In a city with 200+ pending orders and unpredictable weather, how do we maximize delivery throughput while minimizing the energy footprint of 100+ drones?"**
+## 🧠 The Engineering Challenge: "The Kovai Efficiency Crisis"
+The city's logistics hub is overwhelmed. We have **200+ incoming orders** and **100 drones** of varying classes, but the operation is currently losing money due to inefficient scheduling and drone battery failures during weather spikes.
 
-Your system must handle:
-1. **Strategic Planning**: Parse unstructured orders and determine the optimal sequence of deliveries.
-2. **Dynamic Adaptation**: Respond to real-time disruptions like STORMY weather or low battery levels.
-3. **Multi-Step Execution**: Generate and validate complex chains of actions (Maneuver -> Pickup -> Deliver -> Charge).
+**The core problem you must solve**: 
+> "If a sudden **STORMY** weather front hits the city at Tick 100, which 30% of high-priority medical deliveries can we still guarantee, and how must the remaining 70% of the fleet be re-routed to the Hub to avoid a 0% battery crash?"
+
+Your system must solve this by implementing:
+1. **Semantic Extraction**: Identify "Medical," "Urgent," or "Fragile" priorities from the unstructured text of `orders.csv`.
+2. **Combinatorial Matching**: Solve the "Drone-to-Order" matching problem—never send a 30kg Titan to deliver a 0.5kg document.
+3. **Predictive Energy Auditing**: Calculate the "Point of No Return" for every drone based on dynamic weather multipliers.
 
 ---
 
@@ -76,10 +79,29 @@ Your final submission will be evaluated on your ability to transform a simple sc
 
 ---
 
-## ⚡ Quick Start
-1. **Install**: `pip install -r requirements.txt`
-2. **Explore**: Look at `src/simulation/kovai_engine.py` to understand the world logic.
-3. **Build**: Open `src/agent/my_agent.py`. A functional **Heuristic Baseline** is provided so you can see the engine in action. Your task is to replace this with a Multi-Agent Multi-Protocol system.
+## ⚡ Quick Start: Running Your First Mission
+
+### 1. Setup Environment
+Ensure you have Python 3.8+ installed, then install the dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+### 2. Run the Heuristic Baseline
+We have provided a functional baseline so you can see the simulation in action immediately.
+
+**To run with a small sample (3 drones, 5 orders):**
+```bash
+python run_mission.py --fleet data/sample/fleet_sample.csv --orders data/sample/orders_sample.csv
+```
+
+**To run the full City-Scale challenge (100 drones, 200 orders):**
+```bash
+python run_mission.py
+```
+
+### 3. Start Building
+Open `src/agent/my_agent.py`. You will see the `orchestrate` method where the baseline logic lives. Your mission is to delete this heuristic code and implement your Multi-Agent system.
 
 ## 👨‍⚖️ Judging Criteria
 - **Architecture Maturity**: How well did you use A2A and MCP?
