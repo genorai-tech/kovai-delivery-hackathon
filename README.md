@@ -1,4 +1,6 @@
-[# 🛸 KovaiDelivery: The Autonomous Logistics Multi-Agent Challenge](https://github.com/genorai-tech/kovai-delivery-hackathon)
+# 🛸 KovaiDelivery: The Autonomous Logistics Multi-Agent Challenge
+
+[![GitHub Repo](https://img.shields.io/badge/GitHub-Repository-blue?logo=github)](https://github.com/genorai-tech/kovai-delivery-hackathon)
 
 Welcome to **KovaiDelivery**. This isn't just a coding task; it’s an engineering challenge to build a robust, multi-agent system capable of managing a city-scale autonomous delivery fleet.
 
@@ -65,10 +67,3 @@ Minimize **Cost** while maximizing **Speed**.
 - **Service Level**: Percentage of delivered orders.
 - **Reliability**: Don't let your drones crash (0% battery)!
 
----
-
-## 👨‍⚖️ Jury Commands
-Judges will evaluate your agent using:
-```bash
-python run_mission.py --fleet data/secret/fleet_secret.csv --orders data/secret/orders_secret.csv
-```
