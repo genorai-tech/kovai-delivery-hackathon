@@ -1,6 +1,7 @@
 import time
 import csv
 import argparse
+import random
 from src.simulation.kovai_engine import KovaiSim
 from src.agent.my_agent import KovaiAgent
 
@@ -42,6 +43,9 @@ def main():
 
     print(f"🚀 Initializing KovaiDelivery: Enterprise Edition...")
     
+    # Set seed for reproducibility
+    random.seed(42)
+    
     # Load configurations
     fleet_config = load_fleet(args.fleet)
     all_orders = load_orders(args.orders)
@@ -57,7 +61,7 @@ def main():
             # Inject orders scheduled for this tick
             for order in all_orders:
                 if order['tick'] == t:
-                    sim.inject_order(order['text'], order['mass'], order['dest'])
+                    sim.inject_order(order['id'], order['text'], order['mass'], order['dest'])
 
             state = sim.get_state()
             
@@ -71,8 +75,13 @@ def main():
             # Agent decides
             actions = agent.decide(state)
             
+            # Scenario: The Kovai Efficiency Crisis (Storm at Tick 100-150)
+            weather = None
+            if 100 <= t <= 150:
+                weather = "STORMY"
+            
             # Tick the simulation
-            state = sim.step(actions=actions)
+            state = sim.step(actions=actions, weather_override=weather)
 
             if state['stats']['deliveries'] == len(all_orders) and all(d['load'] == 0 for d in state['drones'].values()):
                 print(f"\n✅ SUCCESS: All {len(all_orders)} orders fulfilled in {t} ticks!")

@@ -13,26 +13,40 @@ class Drone:
         self.status = "IDLE" # IDLE, IN_TRANSIT, CHARGING, CRASHED
         self.target_order = None
 
-    def move_towards(self, target):
-        if self.battery <= 0:
+    def move_towards(self, target, weather="CLEAR"):
+        if self.status == "CRASHED" or self.battery <= 0:
             self.status = "CRASHED"
             return "CRASHED"
         
+        # Weather multipliers
+        speed_multiplier = 0.5 if weather == "STORMY" else 1.0
+        battery_multiplier = 2.0 if weather == "STORMY" else (1.5 if weather == "WINDY" else 1.0)
+        
+        effective_speed = self.speed * speed_multiplier
+        effective_discharge = self.discharge_rate * battery_multiplier
+
         x1, y1 = self.position
         x2, y2 = target
         dx, dy = x2 - x1, y2 - y1
         distance = math.sqrt(dx**2 + dy**2)
         
-        if distance <= self.speed:
+        if distance <= effective_speed:
             self.position = target
-            self.battery -= distance * self.discharge_rate
-            return "ARRIVED"
+            self.battery -= distance * effective_discharge
+            res = "ARRIVED"
         else:
-            move_x = (dx / distance) * self.speed
-            move_y = (dy / distance) * self.speed
+            move_x = (dx / distance) * effective_speed
+            move_y = (dy / distance) * effective_speed
             self.position = (x1 + move_x, y1 + move_y)
-            self.battery -= self.speed * self.discharge_rate
-            return "IN_TRANSIT"
+            self.battery -= effective_speed * effective_discharge
+            res = "IN_TRANSIT"
+
+        if self.battery <= 0:
+            self.battery = 0
+            self.status = "CRASHED"
+            return "CRASHED"
+        
+        return res
 
     def charge(self):
         if self.position == (0, 0):
@@ -85,9 +99,9 @@ class KovaiSim:
             }
         }
 
-    def inject_order(self, order_text, mass, destination):
+    def inject_order(self, order_id, order_text, mass, destination):
         self.orders.append({
-            "id": random.randint(1000, 9999), 
+            "id": order_id, 
             "text": order_text, 
             "mass": mass,
             "destination": destination,
@@ -102,13 +116,16 @@ class KovaiSim:
             target = params.get("target") # (x, y)
             old_pos = drone.position
             old_bat = drone.battery
-            res = drone.move_towards(target)
+            res = drone.move_towards(target, self.weather)
             
             # Update stats
             self.total_distance += math.dist(old_pos, drone.position)
             self.total_battery_used += (old_bat - drone.battery)
             
-            drone.status = "IN_TRANSIT" if res == "IN_TRANSIT" else "IDLE"
+            if res == "CRASHED":
+                print(f"💥 [Engine] {drone_id} CRASHED at {drone.position} due to battery depletion!")
+            else:
+                drone.status = "IN_TRANSIT" if res == "IN_TRANSIT" else "IDLE"
         elif action == "CHARGE":
             drone.charge()
         elif action == "PICKUP":
@@ -128,7 +145,7 @@ class KovaiSim:
                         order["status"] = "DELIVERED"
                         self.completed_orders.append(order)
 
-    def step(self, actions=None):
+    def step(self, actions=None, weather_override=None):
         self.time_step += 1
         
         # Apply actions
@@ -137,7 +154,9 @@ class KovaiSim:
                 self.process_action(drone_id, act_data["action"], act_data.get("params", {}))
         
         # Random weather changes
-        if random.random() < 0.1:
+        if weather_override:
+            self.weather = weather_override
+        elif random.random() < 0.1:
             self.weather = random.choice(["CLEAR", "WINDY", "STORMY"])
             
         return self.get_state()
